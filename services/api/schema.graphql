@@ -1,0 +1,36 @@
+type Void {
+	success: Boolean!
+}
+
+enum Gate {
+	Entry
+	Exit
+}
+
+type Mutation {
+	openGate(gate: Gate!): Void!
+	createReservation(spot: ID!, subject: String!, time: Int!): Void!
+}
+
+type Query {
+	activeCars: [ActiveCar!]!
+	reservations: [Reservation!]!
+	spots: Spots!
+}
+
+type ActiveCar {
+	licensePlate: String!
+	arrival: Long!
+}
+
+type Reservation {
+	spot: ID!
+	subject: String!
+	creationTimestamp: String!
+	expirationTimestamp: String!
+}
+
+type Spots {
+	total: Int!
+	free: Int!
+}

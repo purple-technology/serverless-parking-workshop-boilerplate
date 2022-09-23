@@ -1,0 +1,5 @@
+{
+	"name": "parkinglot-2",
+	"region": "eu-central-1",
+	"main": "stacks/index.ts"
+}
