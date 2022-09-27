@@ -4,32 +4,55 @@ import { useEffect, useState } from 'react'
 export const Reservations: React.FC = () => {
 	const [spot, setSpot] = useState<string>('1')
 	const [time, setTime] = useState<string>('')
-	const [subject, setSubject] = useState<string>('')
+	const [licensePlate, setLicensePlate] = useState<string>('')
 
-	const createReservaton = async (): Promise<void> => {
-		const resp = await API.graphql({
+	const createReservation = async (): Promise<void> => {
+		await API.graphql({
 			query: /* GraphQL */ `
-				mutation ($spot: ID!, $subject: String!, $time: Int!) {
-					createReservation(spot: $spot, subject: $subject, time: $time) {
+				mutation ($spot: ID!, $licensePlate: String!, $time: Int!) {
+					createReservation(
+						spot: $spot
+						licensePlate: $licensePlate
+						time: $time
+					) {
 						success
 					}
 				}
 			`,
 			variables: {
 				spot,
-				subject,
+				licensePlate,
 				time: Number(time)
 			}
 		})
-		console.log(resp)
+	}
+
+	const cancelReservation = async (
+		spot: string,
+		licensePlate: string
+	): Promise<void> => {
+		await API.graphql({
+			query: /* GraphQL */ `
+				mutation ($spot: ID!, $licensePlate: String!) {
+					cancelReservation(spot: $spot, licensePlate: $licensePlate) {
+						success
+					}
+				}
+			`,
+			variables: {
+				spot,
+				licensePlate
+			}
+		})
 	}
 
 	const [reservations, setReservations] = useState<
 		| {
 				spot: string
-				subject: string
+				licensePlate: string
 				creationTimestamp: string
 				expirationTimestamp: string
+				carArrived: boolean
 		  }[]
 		| undefined
 	>()
@@ -39,9 +62,10 @@ export const Reservations: React.FC = () => {
 				query {
 					reservations {
 						spot
-						subject
+						licensePlate
 						creationTimestamp
 						expirationTimestamp
+						carArrived
 					}
 				}
 			`
@@ -49,9 +73,10 @@ export const Reservations: React.FC = () => {
 			data: {
 				reservations: {
 					spot: string
-					subject: string
+					licensePlate: string
 					creationTimestamp: string
 					expirationTimestamp: string
+					carArrived: boolean
 				}[]
 			}
 		}
@@ -91,15 +116,15 @@ export const Reservations: React.FC = () => {
 					max={300}
 					onChange={(event): void => setTime(event.target.value)}
 				/>
-				Subject:
+				License Plate:
 				<input
 					type="text"
-					onChange={(event): void => setSubject(event.target.value)}
+					onChange={(event): void => setLicensePlate(event.target.value)}
 				/>
 				<button
 					type="submit"
 					onClick={async (): Promise<void> => {
-						await createReservaton()
+						await createReservation()
 						await fetchReservations()
 					}}
 				>
@@ -112,24 +137,46 @@ export const Reservations: React.FC = () => {
 				<thead>
 					<tr>
 						<th>Spot</th>
-						<th>Subject</th>
+						<th>License Plate</th>
 						<th>Booking creation time</th>
 						<th>Expiration time</th>
+						<th>Car arrived</th>
+						<th>Action</th>
 					</tr>
 				</thead>
 				<tbody>
 					{(reservations ?? []).map(
-						({ spot, subject, creationTimestamp, expirationTimestamp }, i) => (
+						(
+							{
+								spot,
+								licensePlate,
+								creationTimestamp,
+								expirationTimestamp,
+								carArrived
+							},
+							i
+						) => (
 							<tr key={i}>
 								<td>{spot}</td>
-								<td>{subject}</td>
+								<td>{licensePlate}</td>
 								<td>{creationTimestamp}</td>
-								<td>{expirationTimestamp}</td>
+								<td>{carArrived ? '' : expirationTimestamp}</td>
+								<td>{carArrived ? 'Yes' : 'No'}</td>
+								<td>
+									<button
+										onClick={async () => {
+											await cancelReservation(spot, licensePlate)
+											await fetchReservations()
+										}}
+									>
+										Cancel
+									</button>
+								</td>
 							</tr>
 						)
 					)}
 					<tr>
-						<td colSpan={4}>
+						<td colSpan={6}>
 							<button onClick={() => fetchReservations()}>Reload</button>
 						</td>
 					</tr>

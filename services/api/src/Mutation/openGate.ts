@@ -8,19 +8,20 @@ export const handler: AppSyncResolverHandler<
 	await axios.post(
 		'https://n6cn5an5dnaedlthyeqrvh7pla.appsync-api.eu-central-1.amazonaws.com/graphql',
 		{
-			query: `
-				mutation($gate: Gate!) {
+			query: /* GraphQL */ `
+				mutation ($gate: Gate!) {
 					openGate(gate: $gate) {
 						success
 					}
-				}`,
+				}
+			`,
 			variables: {
 				gate: event.arguments.gate
 			}
 		},
 		{
 			headers: {
-				'x-api-key': 'da2-p7mourlpivhv5metkdociqoe5q'
+				'x-api-key': 'da2-3cv5r6iyhnbb5hsix5u2iegriy'
 			}
 		}
 	)

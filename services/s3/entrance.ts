@@ -37,22 +37,77 @@ export const handler: S3Handler = async (event) => {
 			})
 			.promise()
 
+		const reservation = await dynamoDb
+			.query({
+				TableName: `${process.env.RESERVATIONS_TABLE}`,
+				IndexName: 'byLicensePlate',
+				ExpressionAttributeValues: {
+					':licensePlate': licensePlate.DetectedText
+				},
+				KeyConditionExpression: 'licensePlate = :licensePlate'
+			})
+			.promise()
+
+		if (
+			typeof reservation.Items !== 'undefined' &&
+			reservation.Items.length > 0 &&
+			typeof reservation.Items[0].spotNumber === 'string'
+		) {
+			await axios.post(
+				'https://n6cn5an5dnaedlthyeqrvh7pla.appsync-api.eu-central-1.amazonaws.com/graphql',
+				{
+					query: /* GraphQL */ `
+						mutation ($spot: ID!) {
+							occupySpot(spot: $spot) {
+								success
+							}
+							navigateToSpot(spot: $spot) {
+								success
+							}
+						}
+					`,
+					variables: {
+						spot: reservation.Items[0].spotNumber
+					}
+				},
+				{
+					headers: {
+						'x-api-key': 'da2-3cv5r6iyhnbb5hsix5u2iegriy'
+					}
+				}
+			)
+
+			await dynamoDb
+				.update({
+					TableName: `${process.env.RESERVATIONS_TABLE}`,
+					Key: {
+						spotNumber: reservation.Items[0].spotNumber
+					},
+					ExpressionAttributeValues: {
+						':carArrived': true
+					},
+					UpdateExpression: 'SET carArrived = :carArrived'
+				})
+				.promise()
+		}
+
 		await axios.post(
 			'https://n6cn5an5dnaedlthyeqrvh7pla.appsync-api.eu-central-1.amazonaws.com/graphql',
 			{
-				query: `
-						mutation($gate: Gate!) {
-							openGate(gate: $gate) {
-								success
-							}
-						}`,
+				query: /* GraphQL */ `
+					mutation ($gate: Gate!) {
+						openGate(gate: $gate) {
+							success
+						}
+					}
+				`,
 				variables: {
 					gate: 'Entry'
 				}
 			},
 			{
 				headers: {
-					'x-api-key': 'da2-p7mourlpivhv5metkdociqoe5q'
+					'x-api-key': 'da2-3cv5r6iyhnbb5hsix5u2iegriy'
 				}
 			}
 		)

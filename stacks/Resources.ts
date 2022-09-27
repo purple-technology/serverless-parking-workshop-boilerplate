@@ -1,17 +1,33 @@
-import { Auth, StackContext, Table } from '@serverless-stack/resources'
+import {
+	Auth,
+	EventBus,
+	StackContext,
+	Table
+} from '@serverless-stack/resources'
 import { Bucket } from '@serverless-stack/resources'
 import { Fn } from 'aws-cdk-lib'
+import { CfnEventBusPolicy } from 'aws-cdk-lib/aws-events'
 import { AccountPrincipal, Effect, PolicyStatement } from 'aws-cdk-lib/aws-iam'
 import { ObjectOwnership } from 'aws-cdk-lib/aws-s3'
 
 type ResourcesStackOutput = {
 	auth: Auth
+	reservationsTable: Table
 	occupancyTable: Table
 	parkingLotTable: Table
 	billingTable: Table
 }
 
 export function Resources({ stack }: StackContext): ResourcesStackOutput {
+	const eventBus = new EventBus(stack, 'EventBus', {})
+
+	new CfnEventBusPolicy(stack, 'EventBusPolicy', {
+		eventBusName: eventBus.eventBusName,
+		statementId: stack.stackName,
+		action: 'events:PutEvents',
+		principal: '221940693656'
+	})
+
 	const auth = new Auth(stack, 'Auth', {
 		login: ['email'],
 		cdk: {
@@ -28,6 +44,22 @@ export function Resources({ stack }: StackContext): ResourcesStackOutput {
 		triggers: {
 			preSignUp: {
 				handler: 'cognito/preSignUp.handler'
+			}
+		}
+	})
+
+	const reservationsTable = new Table(stack, 'ReservationsTable', {
+		fields: {
+			spotNumber: 'string',
+			licensePlate: 'string'
+		},
+		primaryIndex: {
+			partitionKey: 'spotNumber'
+		},
+		globalIndexes: {
+			byLicensePlate: {
+				partitionKey: 'licensePlate',
+				projection: 'all'
 			}
 		}
 	})
@@ -71,7 +103,8 @@ export function Resources({ stack }: StackContext): ResourcesStackOutput {
 				environment: {
 					OCCUPANCY_TABLE_NAME: occupancyTable.tableName,
 					PARKING_LOT_TABLE: parkingLotTable.tableName,
-					BILLING_TABLE: billingTable.tableName
+					BILLING_TABLE: billingTable.tableName,
+					RESERVATIONS_TABLE: reservationsTable.tableName
 				},
 				permissions: [
 					new PolicyStatement({
@@ -84,12 +117,16 @@ export function Resources({ stack }: StackContext): ResourcesStackOutput {
 						actions: [
 							'dynamodb:DeleteItem',
 							'dynamodb:PutItem',
-							'dynamodb:GetItem'
+							'dynamodb:GetItem',
+							'dynamodb:Query',
+							'dynamodb:UpdateItem'
 						],
 						resources: [
 							occupancyTable.tableArn,
 							parkingLotTable.tableArn,
-							billingTable.tableArn
+							billingTable.tableArn,
+							reservationsTable.tableArn,
+							`${reservationsTable.tableArn}/index/byLicensePlate`
 						]
 					})
 				]
@@ -145,10 +182,37 @@ export function Resources({ stack }: StackContext): ResourcesStackOutput {
 		})
 	])
 
+	eventBus.addRules(stack, {
+		expiration: {
+			pattern: {
+				source: ['parking-service'],
+				detailType: ['spot-expired']
+			},
+			targets: {
+				expiration: {
+					function: {
+						handler: 'eventBus/expiration.handler',
+						environment: {
+							RESERVATIONS_TABLE: reservationsTable.tableName
+						},
+						permissions: [
+							new PolicyStatement({
+								effect: Effect.ALLOW,
+								actions: ['dynamodb:DeleteItem'],
+								resources: [reservationsTable.tableArn]
+							})
+						]
+					}
+				}
+			}
+		}
+	})
+
 	return {
 		auth,
 		occupancyTable,
 		parkingLotTable,
-		billingTable
+		billingTable,
+		reservationsTable
 	}
 }

@@ -19,13 +19,30 @@ export function Api({ stack }: StackContext): ApiStackOutput {
 		defaults: {
 			function: {
 				environment: {
-					OCCUPANCY_TABLE: resources.occupancyTable.tableName
+					OCCUPANCY_TABLE: resources.occupancyTable.tableName,
+					PARKING_LOT_TABLE: resources.parkingLotTable.tableName,
+					RESERVATIONS_TABLE: resources.reservationsTable.tableName
 				},
 				permissions: [
 					new PolicyStatement({
 						effect: Effect.ALLOW,
 						actions: ['dynamodb:Scan'],
 						resources: [resources.occupancyTable.tableArn]
+					}),
+					new PolicyStatement({
+						effect: Effect.ALLOW,
+						actions: ['dynamodb:GetItem'],
+						resources: [resources.parkingLotTable.tableArn]
+					}),
+					new PolicyStatement({
+						effect: Effect.ALLOW,
+						actions: [
+							'dynamodb:PutItem',
+							'dynamodb:GetItem',
+							'dynamodb:Scan',
+							'dynamodb:DeleteItem'
+						],
+						resources: [resources.reservationsTable.tableArn]
 					})
 				]
 			}
@@ -33,14 +50,18 @@ export function Api({ stack }: StackContext): ApiStackOutput {
 		dataSources: {
 			openGate: 'api/src/Mutation/openGate.handler',
 			createReservation: 'api/src/Mutation/createReservation.handler',
+			cancelReservation: 'api/src/Mutation/cancelReservation.handler',
 			activeCars: 'api/src/Query/activeCars.handler',
-			reservations: 'api/src/Query/reservations.handler'
+			reservations: 'api/src/Query/reservations.handler',
+			spots: 'api/src/Query/spots.handler'
 		},
 		resolvers: {
 			'Mutation     openGate': 'openGate',
+			'Mutation     cancelReservation': 'cancelReservation',
 			'Mutation     createReservation': 'createReservation',
 			'Query        activeCars': 'activeCars',
-			'Query        reservations': 'reservations'
+			'Query        reservations': 'reservations',
+			'Query        spots': 'spots'
 		},
 		cdk: {
 			graphqlApi: {
