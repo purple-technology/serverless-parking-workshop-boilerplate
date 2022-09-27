@@ -5,7 +5,7 @@ import {
 	Table
 } from '@serverless-stack/resources'
 import { Bucket } from '@serverless-stack/resources'
-import { Fn } from 'aws-cdk-lib'
+import { Fn, RemovalPolicy } from 'aws-cdk-lib'
 import { CfnEventBusPolicy } from 'aws-cdk-lib/aws-events'
 import { AccountPrincipal, Effect, PolicyStatement } from 'aws-cdk-lib/aws-iam'
 import { ObjectOwnership } from 'aws-cdk-lib/aws-s3'
@@ -15,10 +15,9 @@ type ResourcesStackOutput = {
 	reservationsTable: Table
 	occupancyTable: Table
 	parkingLotTable: Table
-	billingTable: Table
 }
 
-export function Resources({ stack }: StackContext): ResourcesStackOutput {
+export function Resources({ stack, app }: StackContext): ResourcesStackOutput {
 	const eventBus = new EventBus(stack, 'EventBus', {})
 
 	new CfnEventBusPolicy(stack, 'EventBusPolicy', {
@@ -82,20 +81,13 @@ export function Resources({ stack }: StackContext): ResourcesStackOutput {
 		}
 	})
 
-	const billingTable = new Table(stack, 'BillingTable', {
-		fields: {
-			licensePlate: 'string'
-		},
-		primaryIndex: {
-			partitionKey: 'licensePlate'
-		}
-	})
-
 	const bucket = new Bucket(stack, 'Bucket', {
 		name: `${stack.stackName}.photos`,
 		cdk: {
 			bucket: {
-				objectOwnership: ObjectOwnership.BUCKET_OWNER_ENFORCED
+				objectOwnership: ObjectOwnership.BUCKET_OWNER_ENFORCED,
+				autoDeleteObjects: true,
+				removalPolicy: app.defaultRemovalPolicy as RemovalPolicy
 			}
 		},
 		defaults: {
@@ -103,7 +95,6 @@ export function Resources({ stack }: StackContext): ResourcesStackOutput {
 				environment: {
 					OCCUPANCY_TABLE_NAME: occupancyTable.tableName,
 					PARKING_LOT_TABLE: parkingLotTable.tableName,
-					BILLING_TABLE: billingTable.tableName,
 					RESERVATIONS_TABLE: reservationsTable.tableName
 				},
 				permissions: [
@@ -124,7 +115,6 @@ export function Resources({ stack }: StackContext): ResourcesStackOutput {
 						resources: [
 							occupancyTable.tableArn,
 							parkingLotTable.tableArn,
-							billingTable.tableArn,
 							reservationsTable.tableArn,
 							`${reservationsTable.tableArn}/index/byLicensePlate`
 						]
@@ -212,7 +202,6 @@ export function Resources({ stack }: StackContext): ResourcesStackOutput {
 		auth,
 		occupancyTable,
 		parkingLotTable,
-		billingTable,
 		reservationsTable
 	}
 }
