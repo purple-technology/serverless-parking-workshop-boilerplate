@@ -17,6 +17,7 @@
 		"@microsoft/eslint-plugin-sdl": "^0.2.0",
 		"@serverless-stack/cli": "^1.9.4",
 		"@serverless-stack/resources": "^1.9.4",
+		"@sls-next/lambda-at-edge": "^3.7.0",
 		"@tsconfig/node16": "^1.0.3",
 		"@typescript-eslint/eslint-plugin": "5.33.0",
 		"@typescript-eslint/parser": "5.33.0",
@@ -36,8 +37,5 @@
 	"workspaces": [
 		"services",
 		"frontend"
-	],
-	"dependencies": {
-		"@sls-next/lambda-at-edge": "^3.7.0"
-	}
+	]
 }
