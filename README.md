@@ -1,18 +1,33 @@
 # serverless-parking-workshop-boilerplate
 Boilerplate used when doing the workshop
 
+## Node.js
+- [Official download page](https://nodejs.org/en/download/)
+- [Or via `nvm`](https://github.com/nvm-sh/nvm#installing-and-updating)
+
+## AWS CLI
+- [Official installation guildelines](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
+- Setup configuration via `$ aws configure --profile workshop`
+- Add credentials to `$ nano ~/.aws/credentials`
+
 ## Serverless Stack (SST)
 
 - `$ nvm use 16`
 - Create SST project via `$ npx create-sst my-app`
 - Constructs docs: https://docs.sst.dev/constructs
+- How SST works with AWS profiles: https://docs.sst.dev/working-with-your-team#aws-account-per-environment 
+- Cross stack references via `use`: https://docs.sst.dev/advanced/cross-stack-references
 
 ## Auth (Amazon Cognito)
 - [SST docs](https://docs.sst.dev/constructs/Auth)
 - [CDK docs](https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.aws_cognito.UserPool.html)
-- 
 
+## API (AWS AppSync)
+- [Authorization & Authentication docs](https://docs.aws.amazon.com/appsync/latest/devguide/security-authz.html)
+- [AppSyncApi SST docs](https://docs.sst.dev/constructs/AppSyncApi)
 
+## Machine Learning
+- License plate regex `/^[0-9][A-Z]{2} [0-9]{4}$/.test`
 
 ## Frontend
 
@@ -43,48 +58,28 @@ Boilerplate used when doing the workshop
     }
     ```
 
-
-
-
 ## S3 Camera images
 
 - Paths `Entrance, Exit, ParkingLot`
 - Resource Policy
-    ```JSON
-    {
-        "Version": "2012-10-17",
-        "Statement": [
-            {
-                "Sid": "Allow Purple Serverless Workshop",
-                "Effect": "Allow",
-                "Principal": {
-                    "AWS": "arn:aws:iam::221940693656:root"
-                },
-                "Action": "s3:PutObject",
-                "Resource": [
-                    "arn:aws:s3:::BUCKET_NAME/*"
-                ]
-            }
-        ]
-    }
+    ```typescript
+    bucket.cdk.bucket.addToResourcePolicy(
+		new PolicyStatement({
+			effect: Effect.ALLOW,
+			principals: [new AccountPrincipal('221940693656')],
+			actions: ['s3:PutObject'],
+			resources: [`arn:aws:s3:::${bucket.bucketName}/*`]
+		})
+	)
     ```
 
-## Nextjs 
-- `$ npx create-next-app@latest --ts --use-npm`
-- `$ npm i -D @serverless-stack/static-site-env -w frontend`
-- https://docs.sst.dev/constructs/NextjsSite
-- `NEXT_PUBLIC_` https://nextjs.org/docs/basic-features/environment-variables#exposing-environment-variables-to-the-browser
-- `$ npm i aws-amplify -w frontend`
-- 
+## EventBridge connection
 
-## API
-- schema:
-    ```graphql
-    type Query {
-
-    }
-
-    type Mutation {
-        
-    }
+-   ```typescript
+    new CfnEventBusPolicy(stack, 'EventBusPolicy', {
+		eventBusName: eventBus.eventBusName,
+		statementId: stack.stackName,
+		action: 'events:PutEvents',
+		principal: '221940693656'
+	})
     ```

@@ -7,7 +7,7 @@ export const Reservations: React.FC = () => {
 	const [licensePlate, setLicensePlate] = useState<string>('')
 
 	const createReservation = async (): Promise<void> => {
-		await API.graphql({
+		const resp = await API.graphql({
 			query: /* GraphQL */ `
 				mutation ($spot: ID!, $licensePlate: String!, $time: Int!) {
 					createReservation(
@@ -25,13 +25,14 @@ export const Reservations: React.FC = () => {
 				time: Number(time)
 			}
 		})
+		console.log(resp)
 	}
 
 	const cancelReservation = async (
 		spot: string,
 		licensePlate: string
 	): Promise<void> => {
-		await API.graphql({
+		const resp = await API.graphql({
 			query: /* GraphQL */ `
 				mutation ($spot: ID!, $licensePlate: String!) {
 					cancelReservation(spot: $spot, licensePlate: $licensePlate) {
@@ -44,6 +45,7 @@ export const Reservations: React.FC = () => {
 				licensePlate
 			}
 		})
+		console.log(resp)
 	}
 
 	const [reservations, setReservations] = useState<
@@ -81,6 +83,7 @@ export const Reservations: React.FC = () => {
 			}
 		}
 		setReservations(resp.data.reservations)
+		console.log(resp)
 	}
 
 	useEffect(() => {
