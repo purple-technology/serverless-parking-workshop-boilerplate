@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 
 export const GateControls: React.FC = () => {
 	const openGate = async (gate: 'Entry' | 'Exit'): Promise<void> => {
-		await API.graphql({
+		const resp = await API.graphql({
 			query: /* GraphQL */ `
 				mutation ($gate: Gate!) {
 					openGate(gate: $gate) {
@@ -15,6 +15,7 @@ export const GateControls: React.FC = () => {
 				gate
 			}
 		})
+		console.log(resp)
 	}
 
 	const [spots, setSpots] = useState<
@@ -43,6 +44,7 @@ export const GateControls: React.FC = () => {
 			}
 		}
 		setSpots(resp.data.spots)
+		console.log(resp)
 	}
 
 	useEffect(() => {
@@ -50,8 +52,6 @@ export const GateControls: React.FC = () => {
 			fetchSpots()
 		}
 	}, [spots])
-
-	console.log(spots)
 
 	return (
 		<div>
@@ -66,7 +66,7 @@ export const GateControls: React.FC = () => {
 
 			<button
 				disabled={
-					typeof spots === 'undefined' || spots.total - spots.taken === 0
+					typeof spots !== 'undefined' && spots.total - spots.taken === 0
 				}
 				onClick={(): Promise<void> => openGate('Entry')}
 			>

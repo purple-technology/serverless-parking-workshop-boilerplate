@@ -14,12 +14,12 @@ type Mutation {
 }
 
 type Query {
-	activeCars: [ActiveCar!]!
+	parkedCars: [ParkedCar!]!
 	reservations: [Reservation!]!
 	spots: Spots!
 }
 
-type ActiveCar {
+type ParkedCar {
 	licensePlate: String!
 	arrival: Long!
 }

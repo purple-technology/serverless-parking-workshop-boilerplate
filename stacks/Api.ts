@@ -47,21 +47,16 @@ export function Api({ stack }: StackContext): ApiStackOutput {
 				]
 			}
 		},
-		dataSources: {
-			openGate: 'api/src/Mutation/openGate.handler',
-			createReservation: 'api/src/Mutation/createReservation.handler',
-			cancelReservation: 'api/src/Mutation/cancelReservation.handler',
-			activeCars: 'api/src/Query/activeCars.handler',
-			reservations: 'api/src/Query/reservations.handler',
-			spots: 'api/src/Query/spots.handler'
-		},
+
 		resolvers: {
-			'Mutation     openGate': 'openGate',
-			'Mutation     cancelReservation': 'cancelReservation',
-			'Mutation     createReservation': 'createReservation',
-			'Query        activeCars': 'activeCars',
-			'Query        reservations': 'reservations',
-			'Query        spots': 'spots'
+			'Mutation     openGate': 'api/src/Mutation/openGate.handler',
+			'Mutation     cancelReservation':
+				'api/src/Mutation/cancelReservation.handler',
+			'Mutation     createReservation':
+				'api/src/Mutation/createReservation.handler',
+			'Query        parkedCars': 'api/src/Query/parkedCars.handler',
+			'Query        reservations': 'api/src/Query/reservations.handler',
+			'Query        spots': 'api/src/Query/spots.handler'
 		},
 		cdk: {
 			graphqlApi: {

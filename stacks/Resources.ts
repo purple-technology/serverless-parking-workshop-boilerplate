@@ -31,6 +31,9 @@ export function Resources({ stack, app }: StackContext): ResourcesStackOutput {
 		login: ['email'],
 		cdk: {
 			userPool: {
+				autoVerify: {
+					email: true
+				},
 				passwordPolicy: {
 					minLength: 6,
 					requireDigits: false,
@@ -38,11 +41,6 @@ export function Resources({ stack, app }: StackContext): ResourcesStackOutput {
 					requireSymbols: false,
 					requireUppercase: false
 				}
-			}
-		},
-		triggers: {
-			preSignUp: {
-				handler: 'cognito/preSignUp.handler'
 			}
 		}
 	})

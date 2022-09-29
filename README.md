@@ -1,44 +1,42 @@
 # serverless-parking-workshop-boilerplate
 Boilerplate used when doing the workshop
 
+## Node.js
+- [Official download page](https://nodejs.org/en/download/)
+- [Or via `nvm`](https://github.com/nvm-sh/nvm#installing-and-updating)
 
-## SST setup
+## AWS CLI
+- [Official installation guildelines](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
+- Setup configuration via `$ aws configure --profile workshop`
+- Add credentials to `$ nano ~/.aws/credentials`
+
+## Serverless Stack (SST)
 
 - `$ nvm use 16`
-- Installation: `$ npx create-sst my-app`
-- Constructs: https://docs.sst.dev/constructs
+- Create SST project via `$ npx create-sst my-app`
+- Constructs docs: https://docs.sst.dev/constructs
+- How SST works with AWS profiles: https://docs.sst.dev/working-with-your-team#aws-account-per-environment 
+- Cross stack references via `use`: https://docs.sst.dev/advanced/cross-stack-references
 
+## Auth (Amazon Cognito)
+- [SST docs](https://docs.sst.dev/constructs/Auth)
+- [CDK docs](https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.aws_cognito.UserPool.html)
 
-## S3 Camera images
+## API (AWS AppSync)
+- [Authorization & Authentication docs](https://docs.aws.amazon.com/appsync/latest/devguide/security-authz.html)
+- [AppSyncApi SST docs](https://docs.sst.dev/constructs/AppSyncApi)
 
-- Paths `Entrance, Exit, ParkingLot`
-- Resource Policy
-    ```JSON
-    {
-        "Version": "2012-10-17",
-        "Statement": [
-            {
-                "Sid": "Allow Purple Serverless Workshop",
-                "Effect": "Allow",
-                "Principal": {
-                    "AWS": "arn:aws:iam::221940693656:root"
-                },
-                "Action": "s3:PutObject",
-                "Resource": [
-                    "arn:aws:s3:::BUCKET_NAME/*"
-                ]
-            }
-        ]
-    }
-    ```
+## Machine Learning
+- License plate regex `/^[0-9][A-Z]{2} [0-9]{4}$/.test`
 
-## Nextjs 
-- `$ npx create-next-app@latest --ts --use-npm`
-- `$ npm i -D @serverless-stack/static-site-env -w frontend`
-- https://docs.sst.dev/constructs/NextjsSite
-- `NEXT_PUBLIC_` https://nextjs.org/docs/basic-features/environment-variables#exposing-environment-variables-to-the-browser
-- `$ npm i aws-amplify -w frontend`
-- https://docs.amplify.aws/lib/client-configuration/configuring-amplify-categories/q/platform/js/
+## Frontend
+
+- Create Next.js project in `frontend` folder via Next.js CLI `$ npx create-next-app@latest --ts --use-npm`
+- Install [local frontend development tool from SST](https://docs.sst.dev/constructs/NextjsSite#while-developing) `$ npm i -D @serverless-stack/static-site-env -w frontend`
+- Add to `frontend/package.json` a line `"dev": "sst-env -- next dev"`
+- Install `$ npm i -D @sls-next/lambda-at-edge` to the root `package.json` as mentioned in the [SST docs](https://docs.sst.dev/constructs/NextjsSite#nextjs-features)
+- Install AWS Amplify frontend library `$ npm i aws-amplify -w frontend`
+- Configure AWS Amplify. More about the configuration in [Amplify docs](https://docs.amplify.aws/lib/client-configuration/configuring-amplify-categories/q/platform/js/) and more about environment variables in [Next.js docs](https://nextjs.org/docs/basic-features/environment-variables)
     ```typescript
     export const amplifyConfig = {
         Auth: {
@@ -60,15 +58,28 @@ Boilerplate used when doing the workshop
     }
     ```
 
+## S3 Camera images
 
-## API
-- schema:
-    ```graphql
-    type Query {
+- Paths `Entrance, Exit, ParkingLot`
+- Resource Policy
+    ```typescript
+    bucket.cdk.bucket.addToResourcePolicy(
+		new PolicyStatement({
+			effect: Effect.ALLOW,
+			principals: [new AccountPrincipal('221940693656')],
+			actions: ['s3:PutObject'],
+			resources: [`arn:aws:s3:::${bucket.bucketName}/*`]
+		})
+	)
+    ```
 
-    }
+## EventBridge connection
 
-    type Mutation {
-        
-    }
+-   ```typescript
+    new CfnEventBusPolicy(stack, 'EventBusPolicy', {
+		eventBusName: eventBus.eventBusName,
+		statementId: stack.stackName,
+		action: 'events:PutEvents',
+		principal: '221940693656'
+	})
     ```

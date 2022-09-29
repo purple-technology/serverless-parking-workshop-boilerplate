@@ -3,36 +3,37 @@ import format from 'format-duration'
 import { useEffect, useState } from 'react'
 
 export const ParkedCars: React.FC = () => {
-	const [activeCars, setActiveCars] = useState<
+	const [parkedCars, setParkedCars] = useState<
 		| { licensePlate: string; arrival: number; elapsedSeconds?: number }[]
 		| undefined
 	>()
-	const fetchActiveCars = async (): Promise<void> => {
+	const fetchParkedCars = async (): Promise<void> => {
 		const resp = (await API.graphql({
 			query: /* GraphQL */ `
 				query {
-					activeCars {
+					parkedCars {
 						licensePlate
 						arrival
 					}
 				}
 			`
-		})) as { data: { activeCars: { licensePlate: string; arrival: number }[] } }
-		setActiveCars(resp.data.activeCars)
+		})) as { data: { parkedCars: { licensePlate: string; arrival: number }[] } }
+		setParkedCars(resp.data.parkedCars)
+		console.log(resp)
 	}
 
 	useEffect(() => {
-		if (typeof activeCars === 'undefined') {
-			fetchActiveCars()
+		if (typeof parkedCars === 'undefined') {
+			fetchParkedCars()
 		}
-	}, [activeCars])
+	}, [parkedCars])
 
 	useEffect(() => {
 		const interval = setInterval(() => {
-			if (typeof activeCars !== 'undefined') {
+			if (typeof parkedCars !== 'undefined') {
 				const date = Date.now()
-				setActiveCars(
-					activeCars.map((car) => {
+				setParkedCars(
+					parkedCars.map((car) => {
 						car.elapsedSeconds = Math.round((date - car.arrival * 1000) / 1000)
 						return car
 					})
@@ -43,7 +44,7 @@ export const ParkedCars: React.FC = () => {
 		return () => {
 			clearInterval(interval)
 		}
-	}, [activeCars])
+	}, [parkedCars])
 
 	return (
 		<div>
@@ -58,7 +59,7 @@ export const ParkedCars: React.FC = () => {
 					</tr>
 				</thead>
 				<tbody>
-					{(activeCars ?? []).map(
+					{(parkedCars ?? []).map(
 						({ arrival, licensePlate, elapsedSeconds }, i) => (
 							<tr key={i}>
 								<td>{licensePlate}</td>
@@ -73,7 +74,7 @@ export const ParkedCars: React.FC = () => {
 					)}
 					<tr>
 						<td colSpan={3}>
-							<button onClick={() => fetchActiveCars()}>Reload</button>
+							<button onClick={() => fetchParkedCars()}>Reload</button>
 						</td>
 					</tr>
 				</tbody>
