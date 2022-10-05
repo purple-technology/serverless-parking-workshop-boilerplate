@@ -1,4 +1,5 @@
 import { API } from 'aws-amplify'
+import { Button, Card } from 'flowbite-react'
 import { useEffect, useState } from 'react'
 
 export const GateControls: React.FC = () => {
@@ -54,31 +55,40 @@ export const GateControls: React.FC = () => {
 	}, [spots])
 
 	return (
-		<div>
-			<h2>Gate controls</h2>
+		<div className="mx-auto w-2/5 pt-20 2xl:w-1/4">
+			<Card>
+				<h2 className="text-2xl">Gate</h2>
+				<div>
+					<span className="font-medium">Free spots: &nbsp;</span>
+					{typeof spots === 'undefined'
+						? '-/-'
+						: `${spots.total - spots.taken}/${spots.total}`}
+				</div>
+				<div className="flex justify-center">
+					<Button.Group>
+						<Button
+							color="gray"
+							disabled={
+								typeof spots !== 'undefined' && spots.total - spots.taken === 0
+							}
+							onClick={(): Promise<void> => openGate('Entry')}
+						>
+							Open Entrance Gate
+						</Button>
 
-			<div>
-				Free spots:
-				{typeof spots === 'undefined'
-					? '0/0'
-					: `${spots.total - spots.taken}/${spots.total}`}
-			</div>
+						<Button
+							color="gray"
+							onClick={(): Promise<void> => openGate('Exit')}
+						>
+							Open Exit Gate
+						</Button>
 
-			<button
-				disabled={
-					typeof spots !== 'undefined' && spots.total - spots.taken === 0
-				}
-				onClick={(): Promise<void> => openGate('Entry')}
-			>
-				Open Entrance Gate
-			</button>
-
-			<button onClick={(): Promise<void> => openGate('Exit')}>
-				Open Exit Gate
-			</button>
-			<br />
-
-			<button onClick={(): Promise<void> => fetchSpots()}>Reload</button>
+						<Button color="gray" onClick={(): Promise<void> => fetchSpots()}>
+							Reload
+						</Button>
+					</Button.Group>
+				</div>
+			</Card>
 		</div>
 	)
 }

@@ -1,4 +1,5 @@
 import { API } from 'aws-amplify'
+import { Button, Card, Table } from 'flowbite-react'
 import format from 'format-duration'
 import { useEffect, useState } from 'react'
 
@@ -47,38 +48,46 @@ export const ParkedCars: React.FC = () => {
 	}, [parkedCars])
 
 	return (
-		<div>
-			<h2>Parked cars</h2>
-
-			<table border={1}>
-				<thead>
-					<tr>
-						<th>License Plate</th>
-						<th>Arrival</th>
-						<th>Elapsed time</th>
-					</tr>
-				</thead>
-				<tbody>
-					{(parkedCars ?? []).map(
-						({ arrival, licensePlate, elapsedSeconds }, i) => (
-							<tr key={i}>
-								<td>{licensePlate}</td>
-								<td>{new Date(arrival * 1000).toISOString()}</td>
-								<td>
-									{typeof elapsedSeconds === 'undefined'
-										? ''
-										: format(elapsedSeconds * 1000)}
-								</td>
-							</tr>
-						)
-					)}
-					<tr>
-						<td colSpan={3}>
-							<button onClick={() => fetchParkedCars()}>Reload</button>
-						</td>
-					</tr>
-				</tbody>
-			</table>
+		<div className="mx-auto w-2/5 pt-10 2xl:w-1/4">
+			<Card>
+				<h2 className="text-2xl">Parked cars</h2>
+				<Table>
+					<Table.Head>
+						<Table.HeadCell>License Plate</Table.HeadCell>
+						<Table.HeadCell>Arrival</Table.HeadCell>
+						<Table.HeadCell>Elapsed time</Table.HeadCell>
+					</Table.Head>
+					<Table.Body className="divide-y">
+						{(parkedCars ?? []).map(
+							({ arrival, licensePlate, elapsedSeconds }, i) => (
+								<Table.Row key={i} className="text-black">
+									<Table.Cell>{licensePlate}</Table.Cell>
+									<Table.Cell>
+										{new Date(arrival * 1000).toISOString()}
+									</Table.Cell>
+									<Table.Cell>
+										{typeof elapsedSeconds === 'undefined'
+											? ''
+											: format(elapsedSeconds * 1000)}
+									</Table.Cell>
+								</Table.Row>
+							)
+						)}
+						{(parkedCars ?? []).length === 0 ? (
+							<Table.Row>
+								<Table.Cell className="text-center" colSpan={3}>
+									No data
+								</Table.Cell>
+							</Table.Row>
+						) : null}
+					</Table.Body>
+				</Table>
+				<div className="flex justify-end">
+					<Button color="gray" onClick={() => fetchParkedCars()}>
+						Reload
+					</Button>
+				</div>
+			</Card>
 		</div>
 	)
 }

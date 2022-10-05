@@ -4,7 +4,7 @@ import { Login } from '../components/Login'
 
 const Home: NextPage = () => {
 	return (
-		<div>
+		<div className="text-black">
 			<Login />
 		</div>
 	)

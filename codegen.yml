@@ -1,0 +1,12 @@
+overwrite: true
+generates:
+  ./services/api/src/types.ts:
+    schema: './services/api/schema.graphql'
+    hooks:
+      afterOneFileWrite:
+        - eslint ./services/api/src/types.ts --fix
+    documents:
+      - './frontend/(src|pages|components)/**/*!(*.d).{gql,ts,tsx}'
+    plugins:
+      - 'typescript'
+      - 'typescript-operations'

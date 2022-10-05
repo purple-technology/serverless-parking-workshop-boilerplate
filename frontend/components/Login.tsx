@@ -1,4 +1,5 @@
 import { Auth } from 'aws-amplify'
+import { Button, Card, Label, TextInput } from 'flowbite-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 
@@ -46,36 +47,55 @@ export const Login: React.FC = () => {
 	}
 
 	return (
-		<div>
-			<h2>Login</h2>
-			<form
-				onSubmit={(event): void => {
-					event.preventDefault()
-				}}
-			>
-				email:
-				<input
-					type="text"
-					onChange={(event): void => setEmail(event.target.value)}
-				/>
-				password:
-				<input
-					type="password"
-					onChange={(event): void => setPassword(event.target.value)}
-				/>
-				<br />
-				<button type="submit" onClick={(): Promise<void> => register()}>
-					Register
-				</button>
-				<br />
-				<button type="submit" onClick={(): Promise<void> => verify()}>
-					Verify
-				</button>
-				<br />
-				<button type="submit" onClick={(): Promise<void> => login()}>
-					Login
-				</button>
-			</form>
+		<div className="mx-auto w-2/5 pt-20 2xl:w-1/4">
+			<Card>
+				<h2 className="text-2xl">Login</h2>
+				<form
+					onSubmit={(event): void => {
+						event.preventDefault()
+					}}
+				>
+					<div className="mb-2 block">
+						<Label value="Email" />
+					</div>
+					<TextInput
+						type="email"
+						onChange={(event): void => setEmail(event.target.value)}
+					/>
+					<div className="mb- block">
+						<Label value="Password" />
+					</div>
+					<TextInput
+						type="password"
+						onChange={(event): void => setPassword(event.target.value)}
+					/>
+					<div className="flex justify-center pt-4">
+						<Button.Group>
+							<Button
+								color="gray"
+								type="submit"
+								onClick={(): Promise<void> => register()}
+							>
+								Register
+							</Button>
+							<Button
+								color="gray"
+								type="submit"
+								onClick={(): Promise<void> => verify()}
+							>
+								Verify
+							</Button>
+							<Button
+								color="gray"
+								type="submit"
+								onClick={(): Promise<void> => login()}
+							>
+								Login
+							</Button>
+						</Button.Group>
+					</div>
+				</form>
+			</Card>
 		</div>
 	)
 }
