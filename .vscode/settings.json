@@ -25,5 +25,10 @@
 	"editor.formatOnSave": true,
 	"prettier.ignorePath": ".eslintignore",
 	"prettier.useEditorConfig": true,
-	"typescript.tsdk": "node_modules/typescript/lib"
+	"typescript.tsdk": "node_modules/typescript/lib",
+	"tailwindCSS.experimental.classRegex": [
+		"tw`([^`]*)", // tw`...`
+		"tw\\.[^`]+`([^`]*)`", // tw.xxx<xxx>`...`
+		"tw\\(.*?\\).*?`([^`]*)" // tw(Component)<xxx>`...`
+	]
 }

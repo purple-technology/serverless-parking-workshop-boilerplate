@@ -64,9 +64,9 @@ export function Api({ stack }: StackContext): ApiStackOutput {
 					defaultAuthorization: {
 						authorizationType: AuthorizationType.USER_POOL,
 						userPoolConfig: {
-							userPool: resources.auth.cdk.userPool,
+							userPool: resources.cognito.cdk.userPool,
 							appIdClientRegex:
-								resources.auth.cdk.userPoolClient.userPoolClientId,
+								resources.cognito.cdk.userPoolClient.userPoolClientId,
 							defaultAction: UserPoolDefaultAction.ALLOW
 						}
 					}

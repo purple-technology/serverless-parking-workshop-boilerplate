@@ -6,7 +6,7 @@ import { Reservations } from '../components/Reservations'
 
 const Controls: NextPage = () => {
 	return (
-		<div>
+		<div className="text-black">
 			<GateControls />
 			<ParkedCars />
 			<Reservations />

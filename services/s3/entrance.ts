@@ -1,6 +1,7 @@
 import { S3Handler } from 'aws-lambda'
 import AWS from 'aws-sdk'
-import axios from 'axios'
+
+import { navigateToSpotApi, occupySpotApi, openGateApi } from '../utils/graphql'
 
 const rekognition = new AWS.Rekognition()
 const dynamoDb = new AWS.DynamoDB.DocumentClient()
@@ -53,29 +54,8 @@ export const handler: S3Handler = async (event) => {
 			reservation.Items.length > 0 &&
 			typeof reservation.Items[0].spotNumber === 'string'
 		) {
-			await axios.post(
-				'https://n6cn5an5dnaedlthyeqrvh7pla.appsync-api.eu-central-1.amazonaws.com/graphql',
-				{
-					query: /* GraphQL */ `
-						mutation ($spot: ID!) {
-							occupySpot(spot: $spot) {
-								success
-							}
-							navigateToSpot(spot: $spot) {
-								success
-							}
-						}
-					`,
-					variables: {
-						spot: reservation.Items[0].spotNumber
-					}
-				},
-				{
-					headers: {
-						'x-api-key': 'da2-3cv5r6iyhnbb5hsix5u2iegriy'
-					}
-				}
-			)
+			await occupySpotApi({ spot: reservation.Items[0].spotNumber })
+			await navigateToSpotApi({ spot: reservation.Items[0].spotNumber })
 
 			await dynamoDb
 				.update({
@@ -91,25 +71,6 @@ export const handler: S3Handler = async (event) => {
 				.promise()
 		}
 
-		await axios.post(
-			'https://n6cn5an5dnaedlthyeqrvh7pla.appsync-api.eu-central-1.amazonaws.com/graphql',
-			{
-				query: /* GraphQL */ `
-					mutation ($gate: Gate!) {
-						openGate(gate: $gate) {
-							success
-						}
-					}
-				`,
-				variables: {
-					gate: 'Entry'
-				}
-			},
-			{
-				headers: {
-					'x-api-key': 'da2-3cv5r6iyhnbb5hsix5u2iegriy'
-				}
-			}
-		)
+		await openGateApi({ gate: 'Entry' })
 	}
 }

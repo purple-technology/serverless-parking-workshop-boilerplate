@@ -1,6 +1,7 @@
 import { AppSyncResolverHandler } from 'aws-lambda'
 import AWS from 'aws-sdk'
-import axios from 'axios'
+
+import { freeSpotApi } from '../../../utils/graphql'
 
 const dynamodb = new AWS.DynamoDB.DocumentClient()
 
@@ -23,26 +24,7 @@ export const handler: AppSyncResolverHandler<
 		}
 	}
 
-	await axios.post(
-		'https://n6cn5an5dnaedlthyeqrvh7pla.appsync-api.eu-central-1.amazonaws.com/graphql',
-		{
-			query: /* GraphQL */ `
-				mutation ($spot: ID!) {
-					freeSpot(spot: $spot) {
-						success
-					}
-				}
-			`,
-			variables: {
-				spot: event.arguments.spot
-			}
-		},
-		{
-			headers: {
-				'x-api-key': 'da2-3cv5r6iyhnbb5hsix5u2iegriy'
-			}
-		}
-	)
+	await freeSpotApi({ spot: event.arguments.spot })
 
 	await dynamodb
 		.delete({

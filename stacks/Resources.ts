@@ -1,5 +1,5 @@
 import {
-	Auth,
+	Cognito,
 	EventBus,
 	StackContext,
 	Table
@@ -11,7 +11,7 @@ import { AccountPrincipal, Effect, PolicyStatement } from 'aws-cdk-lib/aws-iam'
 import { ObjectOwnership } from 'aws-cdk-lib/aws-s3'
 
 type ResourcesStackOutput = {
-	auth: Auth
+	cognito: Cognito
 	reservationsTable: Table
 	occupancyTable: Table
 	parkingLotTable: Table
@@ -27,7 +27,7 @@ export function Resources({ stack, app }: StackContext): ResourcesStackOutput {
 		principal: '221940693656'
 	})
 
-	const auth = new Auth(stack, 'Auth', {
+	const cognito = new Cognito(stack, 'Auth', {
 		login: ['email'],
 		cdk: {
 			userPool: {
@@ -197,7 +197,7 @@ export function Resources({ stack, app }: StackContext): ResourcesStackOutput {
 	})
 
 	return {
-		auth,
+		cognito,
 		occupancyTable,
 		parkingLotTable,
 		reservationsTable

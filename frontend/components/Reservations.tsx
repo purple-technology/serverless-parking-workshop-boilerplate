@@ -1,4 +1,5 @@
 import { API } from 'aws-amplify'
+import { Button, Card, Label, Select, Table, TextInput } from 'flowbite-react'
 import { useEffect, useState } from 'react'
 
 export const Reservations: React.FC = () => {
@@ -93,98 +94,118 @@ export const Reservations: React.FC = () => {
 	}, [reservations])
 
 	return (
-		<div>
-			<h2>Reservations</h2>
-			<h3>New reservation</h3>
-			<form
-				onSubmit={(event): void => {
-					event.preventDefault()
-				}}
-			>
-				Spot:
-				<select onChange={(event): void => setSpot(event.target.value)}>
-					<option value="1">1</option>
-					<option value="2">2</option>
-					<option value="3">3</option>
-					<option value="4">4</option>
-					<option value="5">5</option>
-					<option value="6">6</option>
-					<option value="7">7</option>
-					<option value="8">8</option>
-				</select>
-				Time:
-				<input
-					type="number"
-					min={0}
-					max={300}
-					onChange={(event): void => setTime(event.target.value)}
-				/>
-				License Plate:
-				<input
-					type="text"
-					onChange={(event): void => setLicensePlate(event.target.value)}
-				/>
-				<button
-					type="submit"
-					onClick={async (): Promise<void> => {
-						await createReservation()
-						await fetchReservations()
+		<div className="mx-auto w-3/5 pt-10 pb-20 2xl:w-1/2">
+			<Card>
+				<h2 className="text-2xl">Reservations</h2>
+				<form
+					className="pb-5"
+					onSubmit={(event): void => {
+						event.preventDefault()
 					}}
 				>
-					Create reservation
-				</button>
-			</form>
-
-			<h3>Reservations list</h3>
-			<table border={1}>
-				<thead>
-					<tr>
-						<th>Spot</th>
-						<th>License Plate</th>
-						<th>Booking creation time</th>
-						<th>Expiration time</th>
-						<th>Car arrived</th>
-						<th>Action</th>
-					</tr>
-				</thead>
-				<tbody>
-					{(reservations ?? []).map(
-						(
-							{
-								spot,
-								licensePlate,
-								creationTimestamp,
-								expirationTimestamp,
-								carArrived
-							},
-							i
-						) => (
-							<tr key={i}>
-								<td>{spot}</td>
-								<td>{licensePlate}</td>
-								<td>{creationTimestamp}</td>
-								<td>{carArrived ? '' : expirationTimestamp}</td>
-								<td>{carArrived ? 'Yes' : 'No'}</td>
-								<td>
-									<button
-										onClick={async () => {
-											await cancelReservation(spot, licensePlate)
-											await fetchReservations()
-										}}
-									>
-										Cancel
-									</button>
-								</td>
-							</tr>
-						)
-					)}
-					<tr>
-						<td colSpan={6}>
-							<button onClick={() => fetchReservations()}>Reload</button>
-						</td>
-					</tr>
-				</tbody>
-			</table>
+					<div>
+						<Label value="Spot:" />
+						<Select onChange={(event): void => setSpot(event.target.value)}>
+							<option value="1">1</option>
+							<option value="2">2</option>
+							<option value="3">3</option>
+							<option value="4">4</option>
+							<option value="5">5</option>
+							<option value="6">6</option>
+							<option value="7">7</option>
+							<option value="8">8</option>
+						</Select>
+					</div>
+					<div className="pt-2">
+						<Label value="Time:" />
+						<TextInput
+							type="number"
+							min={0}
+							max={300}
+							onChange={(event): void => setTime(event.target.value)}
+						/>
+					</div>
+					<div className="pt-2">
+						<Label value="License plate:" />
+						<TextInput
+							type="text"
+							onChange={(event): void => setLicensePlate(event.target.value)}
+						/>
+					</div>
+					<div className="flex justify-center pt-2">
+						<Button
+							color="gray"
+							type="submit"
+							onClick={async (): Promise<void> => {
+								await createReservation()
+								await fetchReservations()
+							}}
+						>
+							Create reservation
+						</Button>
+					</div>
+				</form>
+				<Table>
+					<Table.Head>
+						<Table.HeadCell>Spot</Table.HeadCell>
+						<Table.HeadCell>License Plate</Table.HeadCell>
+						<Table.HeadCell>Booking creation time</Table.HeadCell>
+						<Table.HeadCell>Expiration time</Table.HeadCell>
+						<Table.HeadCell>Car arrived</Table.HeadCell>
+						<Table.HeadCell>Action</Table.HeadCell>
+					</Table.Head>
+					<Table.Body className="divide-y">
+						{(reservations ?? []).map(
+							(
+								{
+									spot,
+									licensePlate,
+									creationTimestamp,
+									expirationTimestamp,
+									carArrived
+								},
+								i
+							) => (
+								<Table.Row key={i} className="text-black">
+									<Table.Cell>{spot}</Table.Cell>
+									<Table.Cell>{licensePlate}</Table.Cell>
+									<Table.Cell>
+										{creationTimestamp.replace('T', '\n')}
+									</Table.Cell>
+									<Table.Cell>
+										{carArrived ? '' : expirationTimestamp.replace('T', '\n')}
+									</Table.Cell>
+									<Table.Cell>{carArrived ? 'Yes' : 'No'}</Table.Cell>
+									<Table.Cell>
+										<Button
+											color="gray"
+											size="xs"
+											onClick={async () => {
+												await cancelReservation(spot, licensePlate)
+												await fetchReservations()
+											}}
+										>
+											Cancel
+										</Button>
+									</Table.Cell>
+								</Table.Row>
+							)
+						)}
+						{(reservations ?? []).length === 0 ? (
+							<Table.Row>
+								<Table.Cell className="text-center" colSpan={6}>
+									No data
+								</Table.Cell>
+							</Table.Row>
+						) : null}
+					</Table.Body>
+				</Table>
+				<div className="flex justify-end">
+					<Button color="gray" onClick={() => fetchReservations()}>
+						Reload
+					</Button>
+				</div>
+			</Card>
 		</div>
 	)
 }
