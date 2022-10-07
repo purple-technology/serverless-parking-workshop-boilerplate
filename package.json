@@ -13,7 +13,7 @@
 		"eslint:fix": "eslint 'services' 'stacks' 'frontend' --quiet --ext .ts,.tsx,.js,.jsx,.json --fix",
 		"eslint": "eslint 'services' 'stacks' 'frontend' --quiet --ext .ts,.tsx,.js,.jsx,.json",
 		"graphql-codegen": "graphql-codegen --config codegen.yml",
-		"preinstall": "rm -rf services/frontend/node_modules/.bin/next",
+		"preinstall": "rm -rf frontend/node_modules/.bin/next",
 		"prepare": "mkdir -p frontend/node_modules/.bin && ln -s ../../../node_modules/.bin/next frontend/node_modules/.bin"
 	},
 	"devDependencies": {
