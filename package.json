@@ -3,7 +3,7 @@
 	"version": "0.0.0",
 	"private": true,
 	"scripts": {
-		"start": "sst start",
+		"dev": "sst dev",
 		"build": "sst build",
 		"deploy": "sst deploy",
 		"remove": "sst remove",
@@ -12,22 +12,19 @@
 		"test": "sst load-config -- vitest run",
 		"eslint:fix": "eslint 'services' 'stacks' 'frontend' --quiet --ext .ts,.tsx,.js,.jsx,.json --fix",
 		"eslint": "eslint 'services' 'stacks' 'frontend' --quiet --ext .ts,.tsx,.js,.jsx,.json",
-		"graphql-codegen": "graphql-codegen --config codegen.yml",
-		"preinstall": "rm -rf services/frontend/node_modules/.bin/next",
-		"prepare": "mkdir -p frontend/node_modules/.bin && ln -s ../../../node_modules/.bin/next frontend/node_modules/.bin"
+		"graphql-codegen": "graphql-codegen --config codegen.yml"
 	},
 	"devDependencies": {
 		"@microsoft/eslint-plugin-sdl": "^0.2.0",
-		"@serverless-stack/cli": "^1.15.8",
-		"@serverless-stack/resources": "^1.15.8",
-		"@sls-next/lambda-at-edge": "^3.7.0",
+		"sst": "2.24.1",
+		"constructs": "10.2.69",
+		"aws-cdk-lib": "2.91.0",
 		"@tsconfig/node16": "^1.0.3",
 		"@typescript-eslint/eslint-plugin": "5.33.0",
 		"@typescript-eslint/parser": "5.33.0",
 		"@graphql-codegen/cli": "^2.13.2",
 		"@graphql-codegen/typescript": "^2.7.3",
 		"@graphql-codegen/typescript-operations": "^2.5.3",
-		"aws-cdk-lib": "2.39.1",
 		"eslint": "8.24.0",
 		"eslint-config-prettier": "^8.5.0",
 		"eslint-plugin-node": "^11.1.0",
@@ -38,7 +35,7 @@
 		"eslint-plugin-simple-import-sort": "^7.0.0",
 		"prettier": "2.7.1",
 		"prettier-plugin-tailwindcss": "^0.1.13",
-		"typescript": "^4.8.2",
+		"typescript": "5.1.6",
 		"vitest": "^0.22.1"
 	},
 	"workspaces": [

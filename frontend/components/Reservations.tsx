@@ -94,7 +94,7 @@ export const Reservations: React.FC = () => {
 	}, [reservations])
 
 	return (
-		<div className="mx-auto w-3/5 pt-10 pb-20 2xl:w-1/2">
+		<div className="mx-auto w-3/5 pb-20 pt-10 2xl:w-1/2">
 			<Card>
 				<h2 className="text-2xl">Reservations</h2>
 				<form

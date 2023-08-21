@@ -1,9 +1,9 @@
 import {
 	AuthorizationType,
 	UserPoolDefaultAction
-} from '@aws-cdk/aws-appsync-alpha'
-import { AppSyncApi, StackContext, use } from '@serverless-stack/resources'
+} from 'aws-cdk-lib/aws-appsync'
 import { Effect, PolicyStatement } from 'aws-cdk-lib/aws-iam'
+import { AppSyncApi, StackContext, use } from 'sst/constructs'
 
 import { Resources } from './Resources'
 
@@ -49,14 +49,15 @@ export function Api({ stack }: StackContext): ApiStackOutput {
 		},
 
 		resolvers: {
-			'Mutation     openGate': 'api/src/Mutation/openGate.handler',
+			'Mutation     openGate': 'services/api/src/Mutation/openGate.handler',
 			'Mutation     cancelReservation':
-				'api/src/Mutation/cancelReservation.handler',
+				'services/api/src/Mutation/cancelReservation.handler',
 			'Mutation     createReservation':
-				'api/src/Mutation/createReservation.handler',
-			'Query        parkedCars': 'api/src/Query/parkedCars.handler',
-			'Query        reservations': 'api/src/Query/reservations.handler',
-			'Query        spots': 'api/src/Query/spots.handler'
+				'services/api/src/Mutation/createReservation.handler',
+			'Query        parkedCars': 'services/api/src/Query/parkedCars.handler',
+			'Query        reservations':
+				'services/api/src/Query/reservations.handler',
+			'Query        spots': 'services/api/src/Query/spots.handler'
 		},
 		cdk: {
 			graphqlApi: {

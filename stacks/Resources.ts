@@ -1,14 +1,8 @@
-import {
-	Cognito,
-	EventBus,
-	StackContext,
-	Table
-} from '@serverless-stack/resources'
-import { Bucket } from '@serverless-stack/resources'
 import { Fn, RemovalPolicy } from 'aws-cdk-lib'
 import { CfnEventBusPolicy } from 'aws-cdk-lib/aws-events'
 import { AccountPrincipal, Effect, PolicyStatement } from 'aws-cdk-lib/aws-iam'
 import { ObjectOwnership } from 'aws-cdk-lib/aws-s3'
+import { Bucket, Cognito, EventBus, StackContext, Table } from 'sst/constructs'
 
 type ResourcesStackOutput = {
 	cognito: Cognito
@@ -123,7 +117,7 @@ export function Resources({ stack, app }: StackContext): ResourcesStackOutput {
 		notifications: {
 			entrance: {
 				function: {
-					handler: 's3/entrance.handler'
+					handler: 'services/s3/entrance.handler'
 				},
 				filters: [
 					{
@@ -133,7 +127,7 @@ export function Resources({ stack, app }: StackContext): ResourcesStackOutput {
 				events: ['object_created']
 			},
 			exit: {
-				function: 's3/exit.handler',
+				function: 'services/s3/exit.handler',
 				filters: [
 					{
 						prefix: 'Exit/'
@@ -142,7 +136,7 @@ export function Resources({ stack, app }: StackContext): ResourcesStackOutput {
 				events: ['object_created']
 			},
 			carsCount: {
-				function: 's3/carsCount.handler',
+				function: 'services/s3/carsCount.handler',
 				filters: [
 					{
 						prefix: 'ParkingLot/'
@@ -179,7 +173,7 @@ export function Resources({ stack, app }: StackContext): ResourcesStackOutput {
 			targets: {
 				expiration: {
 					function: {
-						handler: 'eventBus/expiration.handler',
+						handler: 'services/eventBus/expiration.handler',
 						environment: {
 							RESERVATIONS_TABLE: reservationsTable.tableName
 						},

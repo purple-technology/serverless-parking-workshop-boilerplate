@@ -1,4 +1,4 @@
-import { NextjsSite, StackContext, use } from '@serverless-stack/resources'
+import { NextjsSite, StackContext, use } from 'sst/constructs'
 
 import { Api } from './Api'
 import { Resources } from './Resources'
