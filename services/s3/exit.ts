@@ -2,6 +2,8 @@ import { S3Handler } from 'aws-lambda'
 import AWS from 'aws-sdk'
 import axios from 'axios'
 
+import { apiKey } from '../utils/graphql'
+
 const rekognition = new AWS.Rekognition()
 const dynamoDb = new AWS.DynamoDB.DocumentClient()
 
@@ -67,7 +69,7 @@ export const handler: S3Handler = async (event) => {
 			},
 			{
 				headers: {
-					'x-api-key': 'da2-3cv5r6iyhnbb5hsix5u2iegriy'
+					'x-api-key': apiKey
 				}
 			}
 		)
@@ -104,7 +106,7 @@ export const handler: S3Handler = async (event) => {
 				},
 				{
 					headers: {
-						'x-api-key': 'da2-3cv5r6iyhnbb5hsix5u2iegriy'
+						'x-api-key': apiKey
 					}
 				}
 			)

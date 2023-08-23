@@ -1,6 +1,6 @@
 import axios, { AxiosResponse } from 'axios'
 
-const apiKey = 'da2-someapikeyhere'
+export const apiKey = 'da2-someapikeyhere'
 
 const apiUrl =
 	'https://n6cn5an5dnaedlthyeqrvh7pla.appsync-api.eu-central-1.amazonaws.com/graphql'
