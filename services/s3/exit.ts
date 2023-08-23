@@ -1,8 +1,7 @@
 import { S3Handler } from 'aws-lambda'
 import AWS from 'aws-sdk'
-import axios from 'axios'
 
-import { apiKey } from '../utils/graphql'
+import { freeSpotApi, openGateApi } from '../utils/graphql'
 
 const rekognition = new AWS.Rekognition()
 const dynamoDb = new AWS.DynamoDB.DocumentClient()
@@ -53,26 +52,7 @@ export const handler: S3Handler = async (event) => {
 			})
 			.promise()
 
-		await axios.post(
-			'https://n6cn5an5dnaedlthyeqrvh7pla.appsync-api.eu-central-1.amazonaws.com/graphql',
-			{
-				query: /* GraphQL */ `
-					mutation ($gate: Gate!) {
-						openGate(gate: $gate) {
-							success
-						}
-					}
-				`,
-				variables: {
-					gate: 'Exit'
-				}
-			},
-			{
-				headers: {
-					'x-api-key': apiKey
-				}
-			}
-		)
+		await openGateApi({ gate: 'Exit' })
 
 		const reservation = await dynamoDb
 			.query({
@@ -90,26 +70,7 @@ export const handler: S3Handler = async (event) => {
 			reservation.Items.length > 0 &&
 			typeof reservation.Items[0].spotNumber === 'string'
 		) {
-			await axios.post(
-				'https://n6cn5an5dnaedlthyeqrvh7pla.appsync-api.eu-central-1.amazonaws.com/graphql',
-				{
-					query: /* GraphQL */ `
-						mutation ($spot: ID!) {
-							freeSpot(spot: $spot) {
-								success
-							}
-						}
-					`,
-					variables: {
-						spot: reservation.Items[0].spotNumber
-					}
-				},
-				{
-					headers: {
-						'x-api-key': apiKey
-					}
-				}
-			)
+			await freeSpotApi({ spot: reservation.Items[0].spotNumber })
 
 			await dynamoDb
 				.delete({
