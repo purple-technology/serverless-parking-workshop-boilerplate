@@ -84,6 +84,7 @@ export function Resources({ stack, app }: StackContext): ResourcesStackOutput {
 		},
 		defaults: {
 			function: {
+				bind: [occupancyTable, parkingLotTable, reservationsTable],
 				environment: {
 					OCCUPANCY_TABLE_NAME: occupancyTable.tableName,
 					PARKING_LOT_TABLE: parkingLotTable.tableName,
@@ -97,19 +98,8 @@ export function Resources({ stack, app }: StackContext): ResourcesStackOutput {
 					}),
 					new PolicyStatement({
 						effect: Effect.ALLOW,
-						actions: [
-							'dynamodb:DeleteItem',
-							'dynamodb:PutItem',
-							'dynamodb:GetItem',
-							'dynamodb:Query',
-							'dynamodb:UpdateItem'
-						],
-						resources: [
-							occupancyTable.tableArn,
-							parkingLotTable.tableArn,
-							reservationsTable.tableArn,
-							`${reservationsTable.tableArn}/index/byLicensePlate`
-						]
+						actions: ['dynamodb:Query'],
+						resources: [`${reservationsTable.tableArn}/index/byLicensePlate`]
 					})
 				]
 			}
@@ -174,16 +164,10 @@ export function Resources({ stack, app }: StackContext): ResourcesStackOutput {
 				expiration: {
 					function: {
 						handler: 'services/eventBus/expiration.handler',
+						bind: [reservationsTable],
 						environment: {
 							RESERVATIONS_TABLE: reservationsTable.tableName
-						},
-						permissions: [
-							new PolicyStatement({
-								effect: Effect.ALLOW,
-								actions: ['dynamodb:DeleteItem'],
-								resources: [reservationsTable.tableArn]
-							})
-						]
+						}
 					}
 				}
 			}

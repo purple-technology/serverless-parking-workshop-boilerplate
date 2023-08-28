@@ -25,9 +25,10 @@ const config: SSTConfig = {
 			}
 		})
 
-		app.stack(Resources, { id: 'resources' })
-		app.stack(Api, { id: 'api' })
-		app.stack(Frontend, { id: 'frontend' })
+		app
+			.stack(Resources, { id: 'resources' })
+			.stack(Api, { id: 'api' })
+			.stack(Frontend, { id: 'frontend' })
 	}
 }
 

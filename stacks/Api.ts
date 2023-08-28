@@ -2,7 +2,6 @@ import {
 	AuthorizationType,
 	UserPoolDefaultAction
 } from 'aws-cdk-lib/aws-appsync'
-import { Effect, PolicyStatement } from 'aws-cdk-lib/aws-iam'
 import { AppSyncApi, StackContext, use } from 'sst/constructs'
 
 import { Resources } from './Resources'
@@ -18,33 +17,16 @@ export function Api({ stack }: StackContext): ApiStackOutput {
 		schema: 'services/api/schema.graphql',
 		defaults: {
 			function: {
+				bind: [
+					resources.occupancyTable,
+					resources.parkingLotTable,
+					resources.reservationsTable
+				],
 				environment: {
 					OCCUPANCY_TABLE: resources.occupancyTable.tableName,
 					PARKING_LOT_TABLE: resources.parkingLotTable.tableName,
 					RESERVATIONS_TABLE: resources.reservationsTable.tableName
-				},
-				permissions: [
-					new PolicyStatement({
-						effect: Effect.ALLOW,
-						actions: ['dynamodb:Scan'],
-						resources: [resources.occupancyTable.tableArn]
-					}),
-					new PolicyStatement({
-						effect: Effect.ALLOW,
-						actions: ['dynamodb:GetItem'],
-						resources: [resources.parkingLotTable.tableArn]
-					}),
-					new PolicyStatement({
-						effect: Effect.ALLOW,
-						actions: [
-							'dynamodb:PutItem',
-							'dynamodb:GetItem',
-							'dynamodb:Scan',
-							'dynamodb:DeleteItem'
-						],
-						resources: [resources.reservationsTable.tableArn]
-					})
-				]
+				}
 			}
 		},
 
