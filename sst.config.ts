@@ -7,7 +7,7 @@ const config: SSTConfig = {
 		return {
 			name: 'parkinglot',
 			region: 'eu-central-1',
-			profile: 'purple-workshops',
+			// profile: 'purple-workshops',
 			stage: 'dev'
 		}
 	},
