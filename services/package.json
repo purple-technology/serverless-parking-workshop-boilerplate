@@ -5,7 +5,9 @@
 	"scripts": {},
 	"dependencies": {
 		"aws-sdk": "^2.1204.0",
-		"axios": "^0.27.2"
+		"axios": "^1.5.0",
+		"asynckit": "0.4.0",
+		"combined-stream": "1.0.8"
 	},
 	"devDependencies": {
 		"@types/aws-lambda": "^8.10.102"
