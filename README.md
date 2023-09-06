@@ -19,7 +19,7 @@ Boilerplate used when doing the workshop
 - Cross stack references via `use`: https://docs.sst.dev/advanced/cross-stack-references
 
 ## Auth (Amazon Cognito)
-- [SST docs](https://docs.sst.dev/constructs/Auth)
+- [SST docs](https://docs.sst.dev/constructs/Cognito)
 - [CDK docs](https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.aws_cognito.UserPool.html)
 
 ## API (AWS AppSync)
@@ -32,9 +32,7 @@ Boilerplate used when doing the workshop
 ## Frontend
 
 - Create Next.js project in `frontend` folder via Next.js CLI `$ npx create-next-app@latest --ts --use-npm`
-- Install [local frontend development tool from SST](https://docs.sst.dev/constructs/NextjsSite#while-developing) `$ npm i -D @serverless-stack/static-site-env -w frontend`
-- Add to `frontend/package.json` a line `"dev": "sst-env -- next dev"`
-- Install `$ npm i -D @sls-next/lambda-at-edge` to the root `package.json` as mentioned in the [SST docs](https://docs.sst.dev/constructs/NextjsSite#nextjs-features)
+- Add to `frontend/package.json` a line `"dev": "sst bind next dev"`
 - Install AWS Amplify frontend library `$ npm i aws-amplify -w frontend`
 - Configure AWS Amplify. More about the configuration in [Amplify docs](https://docs.amplify.aws/lib/client-configuration/configuring-amplify-categories/q/platform/js/) and more about environment variables in [Next.js docs](https://nextjs.org/docs/basic-features/environment-variables)
     ```typescript
